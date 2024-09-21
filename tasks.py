@@ -2,7 +2,7 @@
 from celery import Celery
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from config import CELERY_BROKER_URL, CELERY_RESULT_BACKEND, DATABASE_URL
+from config import CELERY_BROKER_URL, CELERY_RESULT_BACKEND, DATABASE_URL, CONNECT_ARGS
 from models import Data, Base
 import time
 
@@ -10,7 +10,7 @@ import time
 celery_app = Celery("tasks", broker=CELERY_BROKER_URL, backend=CELERY_RESULT_BACKEND)
 
 # Database configuration
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(DATABASE_URL, connect_args=CONNECT_ARGS)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -25,6 +25,8 @@ def process_data(self, data_id):
         if data:
             # Example processing: convert content to uppercase
             processed_content = data.content.upper()
+            data.content = processed_content
+            db.commit()
             db.close()
             return {"processed_content": processed_content}
         else:

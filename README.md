@@ -14,7 +14,15 @@ uv sync
 
 ## Usage
 
+Start the FastAPI server and Celery worker:
+
 ```
 uv run uvicorn app:app --reload
 uv run celery -A tasks.celery_app worker --loglevel=info
+```
+
+Run the client to create a task:
+
+```
+python client.py
 ```
