@@ -14,15 +14,23 @@ engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-@celery_app.task
-def process_data(data_id):
+@celery_app.task(bind=True)
+def process_data(self, data_id):
     """Celery task to process data."""
-    # Simulate a time-consuming task
-    time.sleep(5)
-    db = SessionLocal()
-    data = db.query(Data).filter(Data.id == data_id).first()
-    if data:
-        # Example processing: convert content to uppercase
-        data.content = data.content.upper()
-        db.commit()
-    db.close()
+    try:
+        # Simulate a time-consuming task
+        time.sleep(5)
+        db = SessionLocal()
+        data = db.query(Data).filter(Data.id == data_id).first()
+        if data:
+            # Example processing: convert content to uppercase
+            processed_content = data.content.upper()
+            db.close()
+            return {"processed_content": processed_content}
+        else:
+            db.close()
+            self.update_state(state="FAILURE", meta={"exc": "Data not found"})
+            raise Exception("Data not found")
+    except Exception as e:
+        self.update_state(state="FAILURE", meta={"exc": str(e)})
+        raise
