@@ -1,13 +1,27 @@
+import os
+
 ###################
 # Postgres config #
 ###################
 
-DATABASE_URL = (
-    "postgresql+psycopg2://postgres:postgres@localhost:5432/fastapi_celery_boilerplate"
+# DATABASE_URL = (
+#     # "postgresql+psycopg://postgres:postgres@localhost:5432/fastapi_celery_boilerplate"
+#     "postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_boilerplate"
+# )
+# CELERY_BROKER_URL = "sqla+" + DATABASE_URL
+# CELERY_RESULT_BACKEND = "db+" + DATABASE_URL
+
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql+psycopg://postgres:postgres@localhost:5432/fastapi_celery_boilerplate",
 )
-CELERY_BROKER_URL = "sqla+" + DATABASE_URL
-CELERY_RESULT_BACKEND = "db+" + DATABASE_URL
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "sqla+" + DATABASE_URL)
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "db+" + DATABASE_URL)
 CONNECT_ARGS = {}
+
+print("Using DATABASE_URL:", DATABASE_URL)
+print("Using CELERY_BROKER_URL:", CELERY_BROKER_URL)
+print("Using CELERY_RESULT_BACKEND:", CELERY_RESULT_BACKEND)
 
 #################
 # SQLite config #
