@@ -16,10 +16,11 @@ RUN pip install uv
 # RUN poetry install --no-dev
 
 # Copy project
-COPY . .
-# COPY *.py ./
-# COPY pyproject.toml ./
-# COPY uv.lock ./
+# COPY . .
+COPY *.py .
+COPY README.md .
+COPY pyproject.toml ./
+COPY uv.lock ./
 
 RUN uv pip install . --system
 
