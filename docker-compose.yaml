@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: uvicorn app:app --host 0.0.0.0 --port 8000
+    # Removed volumes to prevent overwriting container files
+    # volumes:
+    #   - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      # Replace <HOST_ADDRESS> with 'host.docker.internal' for macOS/Windows
+      # or your actual host IP address for Linux
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_boilerplate
+      CELERY_BROKER_URL: sqla+postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_boilerplate
+      CELERY_RESULT_BACKEND: db+postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_boilerplate
+
+  celery_worker:
+    build: .
+    command: celery -A tasks.celery_app worker --loglevel=info
+    # Removed volumes to prevent overwriting container files
+    # volumes:
+    #   - .:/app
+    depends_on:
+      - web
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_boilerplate
+      CELERY_BROKER_URL: sqla+postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_boilerplate
+      CELERY_RESULT_BACKEND: db+postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_boilerplate
+
+# Removed the db service
+
+# Define external volumes if needed
+volumes:
+  db_data:
