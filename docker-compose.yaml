@@ -1,7 +1,8 @@
 version: '3.8'
 
+# TODO: refactor database URLs below, they look ugly
 services:
-  web:
+  backend:
     build: .
     command: uvicorn app:app --host 0.0.0.0 --port 8000
     # Removed volumes to prevent overwriting container files
@@ -12,24 +13,22 @@ services:
     environment:
       # Replace <HOST_ADDRESS> with 'host.docker.internal' for macOS/Windows
       # or your actual host IP address for Linux
-      DATABASE_URL: postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_boilerplate
-      CELERY_BROKER_URL: sqla+postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_boilerplate
-      CELERY_RESULT_BACKEND: db+postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_boilerplate
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_template
+      CELERY_BROKER_URL: sqla+postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_template
+      CELERY_RESULT_BACKEND: db+postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_template
 
-  celery_worker:
+  worker:
     build: .
     command: celery -A tasks.celery_app worker --loglevel=info
     # Removed volumes to prevent overwriting container files
     # volumes:
     #   - .:/app
     depends_on:
-      - web
+      - backend
     environment:
-      DATABASE_URL: postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_boilerplate
-      CELERY_BROKER_URL: sqla+postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_boilerplate
-      CELERY_RESULT_BACKEND: db+postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_boilerplate
-
-# Removed the db service
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_template
+      CELERY_BROKER_URL: sqla+postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_template
+      CELERY_RESULT_BACKEND: db+postgresql+psycopg://postgres:postgres@host.docker.internal:5432/fastapi_celery_template
 
 # Define external volumes if needed
 volumes:

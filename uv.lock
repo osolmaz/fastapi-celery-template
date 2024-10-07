@@ -189,7 +189,7 @@ wheels = [
 ]
 
 [[package]]
-name = "fastapi-celery-boilerplate"
+name = "fastapi-celery-template"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
